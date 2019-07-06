@@ -7,6 +7,7 @@ public class Human : MonoBehaviour {
 
     public GameObject player;
     public Transform startPos;
+    public PandaBehaviour bt;
 
     private float walkSpeed = 2.25f;
     private float jumpSpeed = 5.5f;
@@ -46,6 +47,8 @@ public class Human : MonoBehaviour {
             if (transform.position == currentWaypoint) {
                 targetIndex++;
                 if (targetIndex >= path.Length) {
+                    targetIndex = 0;
+                    path = new Vector3[0];
                     finishedPath = true;
                     yield break;
                 }
@@ -66,8 +69,16 @@ public class Human : MonoBehaviour {
     bool IsChasingTarget = false;
 
     [Task]
+    void ResetVariables() {
+        IsPlayerNear = false;
+        IsChasingTarget = false;
+        finishedPath = true;
+        target = player.transform;
+        Task.current.Succeed();
+    }
+
+    [Task]
     void CheckPlayer() {
-        
         float distanceToPlayer = Vector3.Distance(target.position, transform.position);
         if (distanceToPlayer < 15.0f) {
             IsPlayerNear = true;
@@ -101,23 +112,31 @@ public class Human : MonoBehaviour {
 
     [Task]
     void HoldPlayer() {
-        player.GetComponent<PlayerMovement>().FreezeControls(true);
-        Task.current.Succeed();
+        if (IsPlayerNear) {
+            player.GetComponent<PlayerMovement>().FreezeControls(true);
+            Task.current.Succeed();
+        } else {
+            Task.current.Fail();
+        }
     }
 
     [Task]
     void ReleasePlayer() {
-        player.GetComponent<PlayerMovement>().FreezeControls(false);
-        Task.current.Succeed();
+        if (IsPlayerNear) {
+            player.GetComponent<PlayerMovement>().FreezeControls(false);
+            Task.current.Succeed();
+        } else {
+            Task.current.Fail();
+        }
     }
 
     [Task]
     void GoToStartPosition() {
         target = startPos;
+        IsChasingTarget = true;
         Debug.Log("Target = " + target);
 
         if (finishedPath) {
-            IsChasingTarget = true;
             finishedPath = false;
             PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
             Task.current.Succeed();

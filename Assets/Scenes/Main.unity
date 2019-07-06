@@ -395,6 +395,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1474754103}
   startPos: {fileID: 622752652}
+  bt: {fileID: 505522824}
   hugPlayerTime: 3
 --- !u!136 &505522826
 CapsuleCollider:
