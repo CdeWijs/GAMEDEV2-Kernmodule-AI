@@ -4,19 +4,43 @@ using UnityEngine;
 using Panda;
 
 public class Human : MonoBehaviour {
+    
     public float walkSpeed = 3.5f;
     public float jumpSpeed = 5.5f;
-    public float rightPos;
-    public float leftPos;
-    public float upPos;
+    public Transform player;
 
-    public Player player;
+    private Vector3[] path;
+    private int targetIndex;
     private Vector3 destination;
-
     private List<Human> humans = new List<Human>();
 
     void Start() {
-        player = FindObjectOfType<Player>();
+        player = FindObjectOfType<Player>().transform;
+        PathRequestManager.RequestPath(transform.position, player.position, OnPathFound);
+    }
+
+    public void OnPathFound(Vector3[] newPath, bool pathSuccessful) {
+        if (pathSuccessful) {
+            path = newPath;
+            StopCoroutine("FollowPath");
+            StartCoroutine("FollowPath");
+        }
+    }
+
+    private IEnumerator FollowPath() {
+        Vector3 currentWaypoint = path[0];
+
+        while (true) {
+            if (transform.position == currentWaypoint) {
+                targetIndex++;
+                if (targetIndex >= path.Length) {
+                    yield break;
+                }
+                currentWaypoint = path[targetIndex];
+            }
+            transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, walkSpeed);
+            yield return null;
+        }
     }
 
     #region Tasks
@@ -26,7 +50,7 @@ public class Human : MonoBehaviour {
 
     [Task]
     void CheckPlayer() {
-        float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
+        float distanceToPlayer = Vector3.Distance(player.position, transform.position);
         if (distanceToPlayer < 8.0f) {
             IsPlayerNear = true;
             Task.current.Succeed();

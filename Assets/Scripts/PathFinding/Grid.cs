@@ -7,12 +7,12 @@ public class Grid : MonoBehaviour
     public LayerMask unwalkable;
     public Vector2 gridWorldSize;
     public float nodeRadius;
-    Node[,] grid;
+    public Node[,] grid;
 
     private float nodeDiameter;
     private int gridSizeX, gridSizeY;
 
-    private void Start() {
+    private void Awake() {
         nodeDiameter = nodeRadius * 2;
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);

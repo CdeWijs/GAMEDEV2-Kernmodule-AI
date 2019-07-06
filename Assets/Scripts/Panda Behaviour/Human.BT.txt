@@ -1,7 +1,6 @@
 tree("Root")
 	parallel 
 		repeat mute tree("Idle")
-		repeat mute tree("ChasePlayer")
 
 tree("Idle")
 	sequence
