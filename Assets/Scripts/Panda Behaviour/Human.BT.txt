@@ -1,15 +1,27 @@
 tree("Root")
-	parallel 
-		repeat mute tree("Idle")
+	sequence 
+		tree("Idle")
+		tree("ChaseTarget")
+		tree("CaughtPlayer")
 
 tree("Idle")
 	sequence
-		not IsPlayerNear
+		not IsChasingTarget
 		CheckPlayer
 
-tree("ChasePlayer")
-	while IsPlayerNear
-		sequence
-			CheckPlayer
-			SetDestinationToPlayer
-			MoveToDestination
+tree("ChaseTarget")
+	sequence
+		race
+			not repeat RequestPathAndGoToTarget
+			CheckIfReachedTarget
+
+tree ("CaughtPlayer")
+	sequence
+		HoldPlayer
+		Wait 3.0
+		ReleasePlayer
+		race
+			not repeat GoToStartPosition
+			CheckIfReachedTarget
+
+
