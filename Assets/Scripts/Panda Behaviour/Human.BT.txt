@@ -1,0 +1,16 @@
+tree("Root")
+	parallel 
+		repeat mute tree("Idle")
+		repeat mute tree("ChasePlayer")
+
+tree("Idle")
+	sequence
+		not IsPlayerNear
+		CheckPlayer
+
+tree("ChasePlayer")
+	while IsPlayerNear
+		sequence
+			CheckPlayer
+			SetDestinationToPlayer
+			MoveToDestination
