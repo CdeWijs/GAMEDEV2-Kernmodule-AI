@@ -73,7 +73,7 @@ public class Parent : MonoBehaviour {
         IsPlayerNear = false;
         IsChasingTarget = false;
         IsChildGone = false;
-        child.IsChasingTarget = false;
+        child.AtStartPosition = true;
         finishedPath = true;
         currentTarget = child.transform;
         Task.current.Succeed();
@@ -81,7 +81,7 @@ public class Parent : MonoBehaviour {
 
     [Task]
     void CheckChild() {
-        if (child.IsChasingTarget) {
+        if (!child.AtStartPosition) {
             IsChildGone = true;
             currentTarget = child.transform;
             Task.current.Succeed();
@@ -112,6 +112,7 @@ public class Parent : MonoBehaviour {
     void PickupChild() {
         child.transform.parent = transform;
         child.IsCaptured = true;
+        child.StopCoroutine("FollowPath");
         Task.current.Succeed();
     }
 
@@ -119,6 +120,7 @@ public class Parent : MonoBehaviour {
     void ReleaseChild() {
         child.transform.parent = null;
         child.IsCaptured = false;
+        child.ResetVariables();
         Task.current.Succeed();
     }
 

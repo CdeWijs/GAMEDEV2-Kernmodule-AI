@@ -3,16 +3,13 @@ tree("Root")
 		tree("Idle")
 		tree("ChaseTarget")
 		tree("CaughtPlayer")
-		tree("ResetVariables")
 		Wait(3.0)
 		Fail
 
-tree("ResetVariables")
-	sequence
-		ResetVariables
-
 tree("Idle")
-	CheckPlayer
+	race
+		CheckPlayer
+		tree("Play")
 
 tree("ChaseTarget")
 	while IsPlayerNear
@@ -35,4 +32,15 @@ tree ("CaughtPlayer")
 			not repeat RequestPathAndGoToTarget
 			while IsChasingTarget
 				CheckIfReachedTarget
+		ResetVariables
+
+tree ("Play")
+	sequence
+		Jump
+		Wait(1.0)
+		Jump
+		Wait(1.0)
+		Jump
+		Wait(1.0)
+
 

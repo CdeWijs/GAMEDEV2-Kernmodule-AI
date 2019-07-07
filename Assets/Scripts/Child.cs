@@ -21,6 +21,11 @@ public class Child : MonoBehaviour {
        // PathRequestManager.RequestPath(transform.position, player.position, OnPathFound);
     }
 
+    private IEnumerator JumpUpAndDown() {
+        GetComponent<Rigidbody>().AddForce(new Vector3(0,1,0) * 5, ForceMode.Impulse);
+        yield return new WaitForSeconds(1);
+    }
+
     #region Pathfinding
     public void OnPathFound(Vector3[] newPath, bool pathSuccessful) {
         if (pathSuccessful) {
@@ -56,17 +61,21 @@ public class Child : MonoBehaviour {
     bool IsPlayerNear = false;
 
     [Task]
-    public bool IsChasingTarget = false;
+    bool IsChasingTarget = false;
 
     [Task]
     public bool IsCaptured = false;
 
     [Task]
-    void ResetVariables() {
+    public bool AtStartPosition = true;
+
+    [Task]
+    public void ResetVariables() {
         IsPlayerNear = false;
         IsChasingTarget = false;
         finishedPath = true;
         IsCaptured = false;
+        AtStartPosition = true;
         target = player.transform;
         Task.current.Succeed();
     }
@@ -86,6 +95,7 @@ public class Child : MonoBehaviour {
     [Task] 
     void RequestPathAndGoToTarget() {
         if (finishedPath) {
+            AtStartPosition = false;
             IsChasingTarget = true;
             finishedPath = false;
             PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
@@ -99,6 +109,9 @@ public class Child : MonoBehaviour {
         if (distanceToTarget < 2.0f) {
             IsChasingTarget = false;
             finishedPath = true;
+            if (target == startPos) {
+                AtStartPosition = true;
+            }
             Task.current.Succeed();
         } 
     }
@@ -134,6 +147,12 @@ public class Child : MonoBehaviour {
         } else {
             Task.current.Fail();
         }
+    }
+
+    [Task]
+    void Jump() {
+        StartCoroutine("JumpUpAndDown");
+        Task.current.Succeed();
     }
 
     #endregion
