@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour {
         Run
     }
 
-    private float movementSpeed = 2.5f;
+    private float movementSpeed = 2.75f;
     private float rotationSpeed = 10f;
     private float direction = 0;
 
