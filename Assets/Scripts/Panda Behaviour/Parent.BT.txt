@@ -1,0 +1,75 @@
+tree("Root")
+	sequence
+		tree("Idle")
+		tree("ChaseTarget")
+		tree("CaughtChild")
+		tree("ResetVariables")
+		Wait(1.0)
+		Fail
+
+tree("ResetVariables")
+	sequence
+		ResetVariables
+
+tree("Idle")
+	race
+		CheckChild
+		tree("Guard")
+
+tree("ChaseTarget")
+	while IsChildGone
+		sequence
+			race
+				not repeat RequestPathAndGoToTarget
+				while IsChasingTarget
+					CheckIfReachedTarget
+
+tree ("CaughtChild")
+	sequence
+		PickupChild
+		ChangeTarget "startPosChild"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
+		ReleaseChild
+		ChangeTarget "startPos"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
+
+tree ("Guard")
+	sequence
+		ChangeTarget "GuardPos1"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
+		ChangeTarget "GuardPos2"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
+		ChangeTarget "GuardPos3"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
+		ChangeTarget "GuardPos4"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
+		ChangeTarget "GuardPos5"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
+		ChangeTarget "GuardPos6"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
+		Fail
+

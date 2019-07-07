@@ -3,20 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using Panda;
 
-public class Child : MonoBehaviour {
+public class Parent : MonoBehaviour {
 
     public GameObject player;
+    public Child child;
     public Transform startPos;
+    public Transform guardPos1;
+    public Transform guardPos2;
+    public Transform guardPos3;
+    public Transform guardPos4;
+    public Transform guardPos5;
+    public Transform guardPos6;
     public float noticePlayerDistance;
     public float walkSpeed = 2f;
 
-    private Transform target;
+    private Transform currentTarget;
     private Vector3[] path;
     private int targetIndex;
     private bool finishedPath = true;
 
     void Start() {
-        target = player.transform;
+        currentTarget = child.transform;
         transform.position = startPos.position;
        // PathRequestManager.RequestPath(transform.position, player.position, OnPathFound);
     }
@@ -56,30 +63,28 @@ public class Child : MonoBehaviour {
     bool IsPlayerNear = false;
 
     [Task]
-    public bool IsChasingTarget = false;
+    bool IsChasingTarget = false;
 
     [Task]
-    public bool IsCaptured = false;
+    bool IsChildGone = false;
 
     [Task]
     void ResetVariables() {
         IsPlayerNear = false;
         IsChasingTarget = false;
+        IsChildGone = false;
+        child.IsChasingTarget = false;
         finishedPath = true;
-        IsCaptured = false;
-        target = player.transform;
+        currentTarget = child.transform;
         Task.current.Succeed();
     }
 
     [Task]
-    void CheckPlayer() {
-        float distanceToPlayer = Vector3.Distance(target.position, transform.position);
-        if (distanceToPlayer < noticePlayerDistance) {
-            IsPlayerNear = true;
+    void CheckChild() {
+        if (child.IsChasingTarget) {
+            IsChildGone = true;
+            currentTarget = child.transform;
             Task.current.Succeed();
-        } else {
-            IsPlayerNear = false;
-            Task.current.Fail();
         }
     }
 
@@ -88,14 +93,14 @@ public class Child : MonoBehaviour {
         if (finishedPath) {
             IsChasingTarget = true;
             finishedPath = false;
-            PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+            PathRequestManager.RequestPath(transform.position, currentTarget.position, OnPathFound);
             Task.current.Succeed();
         }
     }
 
     [Task]
     void CheckIfReachedTarget() {
-        float distanceToTarget = Vector3.Distance(target.position, transform.position);
+        float distanceToTarget = Vector3.Distance(currentTarget.position, transform.position);
         if (distanceToTarget < 2.0f) {
             IsChasingTarget = false;
             finishedPath = true;
@@ -104,32 +109,44 @@ public class Child : MonoBehaviour {
     }
 
     [Task]
-    void HoldPlayer() {
-        if (IsPlayerNear) {
-            player.GetComponent<PlayerMovement>().FreezeControls(true);
-            Task.current.Succeed();
-        } else {
-            Task.current.Fail();
-        }
+    void PickupChild() {
+        child.transform.parent = transform;
+        child.IsCaptured = true;
+        Task.current.Succeed();
     }
 
     [Task]
-    void ReleasePlayer() {
-        if (IsPlayerNear) {
-            player.GetComponent<PlayerMovement>().FreezeControls(false);
-            Task.current.Succeed();
-        } else {
-            Task.current.Fail();
-        }
+    void ReleaseChild() {
+        child.transform.parent = null;
+        child.IsCaptured = false;
+        Task.current.Succeed();
     }
 
     [Task]
     void ChangeTarget(string newTarget) {
-        if (newTarget == "startPos") {
-            target = startPos;
+        if (newTarget == "startPosChild") {
+            currentTarget = child.startPos;
             Task.current.Succeed();
-        } else if (newTarget == "player") {
-            target = player.transform;
+        } else if (newTarget == "startPos") {
+            currentTarget = startPos;
+            Task.current.Succeed();
+        } else if (newTarget == "GuardPos1") {
+            currentTarget = guardPos1;
+            Task.current.Succeed();
+        } else if (newTarget == "GuardPos2") {
+            currentTarget = guardPos2;
+            Task.current.Succeed();
+        } else if (newTarget == "GuardPos3") {
+            currentTarget = guardPos3;
+            Task.current.Succeed();
+        } else if (newTarget == "GuardPos4") {
+            currentTarget = guardPos4;
+            Task.current.Succeed();
+        } else if (newTarget == "GuardPos5") {
+            currentTarget = guardPos5;
+            Task.current.Succeed();
+        } else if (newTarget == "GuardPos6") {
+            currentTarget = guardPos6;
             Task.current.Succeed();
         } else {
             Task.current.Fail();

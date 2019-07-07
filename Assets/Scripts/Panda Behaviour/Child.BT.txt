@@ -16,10 +16,14 @@ tree("Idle")
 
 tree("ChaseTarget")
 	while IsPlayerNear
-		sequence
-			race
-				not repeat RequestPathAndGoToTarget
-				CheckIfReachedTarget
+		while not IsCaptured
+			sequence
+				race
+					not repeat RequestPathAndGoToTarget
+					while IsChasingTarget
+						race
+							not repeat CheckPlayer
+							CheckIfReachedTarget
 
 tree ("CaughtPlayer")
 	sequence
