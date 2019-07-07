@@ -1,31 +1,34 @@
 tree("Root")
 	sequence
-		tree("ResetVariables")
 		tree("Idle")
 		tree("ChaseTarget")
+		tree("CaughtPlayer")
+		tree("ResetVariables")
+		Wait(3.0)
+		Fail
 
 tree("ResetVariables")
 	sequence
 		ResetVariables
 
 tree("Idle")
-	sequence
-		not IsChasingTarget
-		CheckPlayer
+	CheckPlayer
 
 tree("ChaseTarget")
-	sequence
-		race
-			not repeat RequestPathAndGoToTarget
-			CheckIfReachedTarget
-		tree("CaughtPlayer")
+	while IsPlayerNear
+		sequence
+			race
+				not repeat RequestPathAndGoToTarget
+				CheckIfReachedTarget
 
 tree ("CaughtPlayer")
 	sequence
 		HoldPlayer
 		Wait 3.0
 		ReleasePlayer
-		GoToStartPosition
-		CheckIfReachedTarget
-
+		ChangeTarget "startPos"
+		race
+			not repeat RequestPathAndGoToTarget
+			while IsChasingTarget
+				CheckIfReachedTarget
 
